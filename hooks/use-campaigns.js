@@ -64,7 +64,7 @@ export function useCampaigns(initialParams = {}) {
   const applySocketUpdate = useCallback((data) => {
     setCampaigns((prev) =>
       prev.map((c) =>
-        c.id === data.campaignId
+        c.id === (data.campaignId || data.id)
           ? { ...c, status: data.status ?? c.status, _progress: data.progress ?? null }
           : c
       )

@@ -7,6 +7,7 @@ import { useCampaignSocket } from '@/hooks/use-campaign-socket';
 import Header from '@/components/layout/Header';
 import CampaignCard from '@/components/campaigns/CampaignCard';
 import CampaignForm from '@/components/campaigns/CampaignForm';
+import CampaignDetails from '@/components/campaigns/CampaignDetails';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
@@ -21,19 +22,32 @@ export default function CampaignsPage() {
   const { templates } = useTemplates();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingCampaign, setEditingCampaign]  = useState(null);
-  const [actionError, setActionError]          = useState(null);
-
-  // تحديثات WebSocket اللحظية
-  useCampaignSocket({ onUpdate: applySocketUpdate });
+  const [editingCampaign,  setEditingCampaign]  = useState(null);
+  const [detailsCampaign,  setDetailsCampaign]  = useState(null);
+  const [actionError,      setActionError]       = useState(null);
 
   const handleCreate = async (data) => {
-    await createCampaign(data);
-    setShowCreateModal(false);
+    setActionError(null);
+    try {
+      await createCampaign(data);
+      setShowCreateModal(false);
+    } catch (err) {
+      setActionError(err.response?.data?.message || 'فشل في إنشاء الحملة');
+    }
   };
 
   const handleEdit = async (data) => {
     setActionError(null);
+    if (editingCampaign?.status === 'running') {
+      setEditingCampaign(null);
+      setActionError('لا يمكن تعديل حملة جارية — انتظر حتى تكتمل أولاً');
+      return;
+    }
+    if (editingCampaign?.status === 'completed') {
+      setEditingCampaign(null);
+      setActionError('لا يمكن تعديل حملة منتهية');
+      return;
+    }
     try {
       await updateCampaign(editingCampaign.id, data);
       setEditingCampaign(null);
@@ -44,6 +58,15 @@ export default function CampaignsPage() {
 
   const handleDelete = async (id) => {
     setActionError(null);
+    const campaign = campaigns.find((c) => c.id === id);
+    if (campaign?.status === 'running') {
+      setActionError('لا يمكن حذف حملة جارية — انتظر حتى تكتمل أولاً');
+      return;
+    }
+    if (campaign?.status === 'completed') {
+      setActionError('لا يمكن حذف حملة منتهية');
+      return;
+    }
     try {
       await deleteCampaign(id);
     } catch (err) {
@@ -60,15 +83,26 @@ export default function CampaignsPage() {
     }
   };
 
+  // WebSocket — نداء واحد فقط يجمع تحديث القائمة + مودال التفاصيل
+  useCampaignSocket({
+    onUpdate: (data) => {
+      const cid = data.campaignId || data.id;
+      applySocketUpdate(data);
+      setDetailsCampaign((prev) =>
+        prev?.id === cid
+          ? { ...prev, status: data.status ?? prev.status, _progress: data.progress ?? null }
+          : prev
+      );
+    },
+  });
+
   return (
     <div className="space-y-5">
       <Header
         title="الحملات"
         subtitle={`${campaigns.length.toLocaleString('ar-EG')} حملة`}
         actions={
-          <Button onClick={() => setShowCreateModal(true)}>
-            + حملة جديدة
-          </Button>
+          <Button onClick={() => setShowCreateModal(true)}>+ حملة جديدة</Button>
         }
       />
 
@@ -85,9 +119,7 @@ export default function CampaignsPage() {
           </svg>
           <p className="text-sm font-medium text-slate-500">لا توجد حملات بعد</p>
           <p className="text-xs text-slate-400 mt-1">أنشئ حملتك الأولى لبدء التواصل مع العملاء</p>
-          <Button className="mt-4" size="sm" onClick={() => setShowCreateModal(true)}>
-            + إنشاء حملة
-          </Button>
+          <Button className="mt-4" size="sm" onClick={() => setShowCreateModal(true)}>+ إنشاء حملة</Button>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -98,38 +130,35 @@ export default function CampaignsPage() {
               onTrigger={handleTrigger}
               onEdit={setEditingCampaign}
               onDelete={handleDelete}
+              onViewDetails={setDetailsCampaign}
             />
           ))}
         </div>
       )}
 
       {/* مودال الإنشاء */}
-      <Modal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        title="إنشاء حملة جديدة"
-        size="lg"
-      >
-        <CampaignForm
-          templates={templates}
-          onSubmit={handleCreate}
-          onCancel={() => setShowCreateModal(false)}
-        />
+      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="إنشاء حملة جديدة" size="lg">
+        <CampaignForm templates={templates} onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} />
       </Modal>
 
       {/* مودال التعديل */}
-      <Modal
-        isOpen={!!editingCampaign}
-        onClose={() => setEditingCampaign(null)}
-        title="تعديل الحملة"
-        size="lg"
-      >
+      <Modal isOpen={!!editingCampaign} onClose={() => setEditingCampaign(null)} title="تعديل الحملة" size="lg">
         <CampaignForm
           templates={templates}
           initialData={editingCampaign}
           onSubmit={handleEdit}
           onCancel={() => setEditingCampaign(null)}
         />
+      </Modal>
+
+      {/* مودال التفاصيل */}
+      <Modal isOpen={!!detailsCampaign} onClose={() => setDetailsCampaign(null)} title="تفاصيل الحملة" size="lg">
+        {detailsCampaign && (
+          <CampaignDetails
+            campaign={detailsCampaign}
+            liveProgress={detailsCampaign._progress}
+          />
+        )}
       </Modal>
     </div>
   );
