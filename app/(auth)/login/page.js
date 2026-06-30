@@ -7,6 +7,7 @@ import { authService } from '@/services/auth.service';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -66,6 +67,16 @@ export default function LoginPage() {
             تسجيل الدخول
           </Button>
         </form>
+      </div>
+
+      <div className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
+        <Link href="/privacy" className="hover:text-blue-600 transition-colors">سياسة الخصوصية</Link>
+        <span className="text-slate-300">•</span>
+        <Link href="/terms" className="hover:text-blue-600 transition-colors">شروط الخدمة</Link>
+        <span className="text-slate-300">•</span>
+        <Link href="/data-deletion" className="hover:text-blue-600 transition-colors">حذف البيانات</Link>
+        <span className="text-slate-300">•</span>
+        <Link href="/contact" className="hover:text-blue-600 transition-colors">اتصل بنا</Link>
       </div>
     </div>
   );

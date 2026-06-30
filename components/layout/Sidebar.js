@@ -124,6 +124,13 @@ export default function Sidebar({ isOpen, onClose }) {
           </svg>
           تسجيل الخروج
         </button>
+
+        <div className="mt-6 flex flex-wrap justify-center gap-x-3 gap-y-2 text-[10px] text-slate-500">
+          <Link href="/privacy" className="hover:text-white transition-colors">الخصوصية</Link>
+          <Link href="/terms" className="hover:text-white transition-colors">الشروط</Link>
+          <Link href="/data-deletion" className="hover:text-white transition-colors">حذف البيانات</Link>
+          <Link href="/contact" className="hover:text-white transition-colors">اتصل بنا</Link>
+        </div>
       </div>
     </aside>
   );
