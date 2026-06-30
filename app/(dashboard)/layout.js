@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }) {
               <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-white font-bold text-xs">
                 BR
               </div>
-              <span className="text-sm font-semibold text-slate-800">BankReach</span>
+              <span className="text-sm font-semibold text-slate-800">BizReach</span>
             </div>
           </div>
 

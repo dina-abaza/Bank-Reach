@@ -63,8 +63,8 @@ export default function Sidebar({ isOpen, onClose }) {
           BR
         </div>
         <div>
-          <p className="text-sm font-semibold text-white">BankReach</p>
-          <p className="text-xs text-slate-400">منصة التواصل البنكي</p>
+          <p className="text-sm font-semibold text-white">BizReach</p>
+          <p className="text-xs text-slate-400">منصة التواصل التجاري</p>
         </div>
         {/* زر الإغلاق على الموبايل فقط */}
         <button

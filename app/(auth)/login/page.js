@@ -32,7 +32,7 @@ export default function LoginPage() {
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-lg">
           BR
         </div>
-        <h1 className="text-2xl font-bold text-slate-900">BankReach</h1>
+        <h1 className="text-2xl font-bold text-slate-900">BizReach</h1>
         <p className="mt-1 text-sm text-slate-500">سجّل دخولك للمتابعة</p>
       </div>
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@bankreach.com"
+            placeholder="admin@bizreach.com"
             required
             autoComplete="email"
           />
