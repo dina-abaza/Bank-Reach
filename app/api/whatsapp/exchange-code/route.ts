@@ -62,8 +62,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
     // Remove trailing slash if present (except for root path)
     const normalizedRedirectUri = redirect_uri.trim().replace(/\/$/, '');
     
-    console.log('Using redirect_uri in backend:', normalizedRedirectUri);
+    console.log('=== DEBUG INFO ===');
     console.log('Original redirect_uri from frontend:', redirect_uri);
+    console.log('Normalized redirect_uri:', normalizedRedirectUri);
+    console.log('Client ID:', clientId);
+    console.log('API Version:', apiVersion);
+    console.log('Code length:', code.trim().length);
+    console.log('Code (first 30 chars):', code.trim().substring(0, 30) + '...');
+    console.log('==================');
 
     // Prepare request to Meta Graph API using FormData
     const tokenUrl = `https://graph.facebook.com/${apiVersion}/oauth/access_token`;
@@ -75,10 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
     formData.append('grant_type', 'authorization_code');
     formData.append('redirect_uri', normalizedRedirectUri);
 
-    console.log('Meta API Request (without secret):', 
-        `${tokenUrl}?client_id=${clientId}&code=${code.trim().substring(0, 20)}...&grant_type=authorization_code&redirect_uri=${normalizedRedirectUri}`);
-    console.log('Code length:', code.trim().length);
-    console.log('API Version:', apiVersion);
+    console.log('Sending request to Meta API with redirect_uri:', normalizedRedirectUri);
 
     const response = await fetch(tokenUrl, {
       method: 'POST',
