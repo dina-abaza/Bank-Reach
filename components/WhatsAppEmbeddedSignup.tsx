@@ -130,10 +130,11 @@ export default function WhatsAppEmbeddedSignup({
 
       console.log('Starting code exchange with code:', response.authResponse.code.substring(0, 20) + '...');
 
-      // For WhatsApp Embedded Signup, we need to use a specific redirect_uri
-      // This should be added to Meta Dashboard: Facebook Login → Settings → Valid OAuth Redirect URIs
-      const redirectUri = 'https://staticxx.facebook.com/connect/xd_arbiter/?version=46';
-      
+      // Determine the redirect URI based on the current environment
+      const protocol = window.location.protocol;
+      const host = window.location.host;
+      const redirectUri = `${protocol}//${host}/auth/callback`;
+
       // Exchange code for access token (non-async callback)
       fetch('/api/whatsapp/exchange-code', {
         method: 'POST',
@@ -142,7 +143,7 @@ export default function WhatsAppEmbeddedSignup({
         },
         body: JSON.stringify({
           code: response.authResponse.code,
-          redirect_uri: redirectUri, // Send redirect_uri to the API
+          redirect_uri: redirectUri,
         }),
       })
         .then(async (exchangeResponse) => {
@@ -169,16 +170,7 @@ export default function WhatsAppEmbeddedSignup({
             2. Incorrect App ID or App Secret
             3. WhatsApp Business API not enabled
             4. Configuration ID incorrect
-            5. Missing redirect_uri in Meta Dashboard
-            
-            🔧 الحل: أضف هذا الـ redirect_uri إلى Meta Dashboard:
-            ${redirectUri}
-            
-            الخطوات:
-            1. انتقل إلى https://developers.facebook.com/apps/
-            2. اختر التطبيق الخاص بك (App ID: ${process.env.NEXT_PUBLIC_FACEBOOK_APP_ID})
-            3. Facebook Login → Settings
-            4. أضف الـ URL أعلاه إلى "Valid OAuth Redirect URIs"`;
+            5. redirect_uri not added to Meta Dashboard`;
           }
           
           setError(errorMessage);
@@ -206,6 +198,13 @@ export default function WhatsAppEmbeddedSignup({
         throw new Error('Facebook SDK not loaded');
       }
 
+      // Determine the redirect URI based on the current environment
+      const protocol = window.location.protocol;
+      const host = window.location.host;
+      const redirectUri = `${protocol}//${host}/auth/callback`;
+      
+      console.log('Using redirect_uri:', redirectUri);
+
       // Start WhatsApp Embedded Signup flow
       FB.login(
         handleFacebookLogin,
@@ -213,6 +212,7 @@ export default function WhatsAppEmbeddedSignup({
           config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '',
           response_type: 'code',
           override_default_response_type: true,
+          redirect_uri: redirectUri,
           extras: {
             setup: {},
           },
