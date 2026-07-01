@@ -69,6 +69,30 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
     console.log('API Version:', apiVersion);
     console.log('Code length:', code.trim().length);
     console.log('Code (first 30 chars):', code.trim().substring(0, 30) + '...');
+    
+    // Send debug info to debug server
+    try {
+      await fetch('http://localhost:3001/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'debug',
+          sessionId: 'whatsapp-redirect-uri-mismatch',
+          timestamp: new Date().toISOString(),
+          data: {
+            originalRedirectUri: redirect_uri,
+            normalizedRedirectUri,
+            clientId,
+            apiVersion,
+            codeLength: code.trim().length,
+            codePrefix: code.trim().substring(0, 30) + '...',
+          }
+        })
+      });
+    } catch (debugErr) {
+      console.log('Failed to send debug log:', debugErr);
+    }
+    
     console.log('==================');
 
     // Prepare request to Meta Graph API using FormData
@@ -82,6 +106,31 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
     formData.append('redirect_uri', normalizedRedirectUri);
 
     console.log('Sending request to Meta API with redirect_uri:', normalizedRedirectUri);
+
+    // Log the exact request being sent to Meta API
+    const requestBody = formData.toString();
+    console.log('Meta API Request Body (without secret):', 
+      requestBody.replace(clientSecret, '***'));
+    
+    try {
+      await fetch('http://localhost:3001/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'meta_api_request',
+          sessionId: 'whatsapp-redirect-uri-mismatch',
+          timestamp: new Date().toISOString(),
+          data: {
+            url: tokenUrl,
+            method: 'POST',
+            redirectUri: normalizedRedirectUri,
+            requestBody: requestBody.replace(clientSecret, '***'),
+          }
+        })
+      });
+    } catch (debugErr) {
+      console.log('Failed to send request debug log:', debugErr);
+    }
 
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -98,6 +147,27 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
         errorData = await response.json();
       } catch (e) {
         console.error('Failed to parse Meta API error response:', e);
+      }
+      
+      // Log the error response from Meta API
+      try {
+        await fetch('http://localhost:3001/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'meta_api_error',
+            sessionId: 'whatsapp-redirect-uri-mismatch',
+            timestamp: new Date().toISOString(),
+            data: {
+              status: response.status,
+              statusText: response.statusText,
+              error: errorData,
+              redirectUri: normalizedRedirectUri,
+            }
+          })
+        });
+      } catch (debugErr) {
+        console.log('Failed to send error debug log:', debugErr);
       }
       
       console.error('Meta API error details:', {

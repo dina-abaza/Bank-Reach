@@ -29,6 +29,21 @@ export default function WhatsAppEmbeddedSignup({
   // Refs for cleanup
   const messageListenerRef = useRef<((event: MessageEvent) => void) | null>(null);
 
+  // Helper function to get the correct redirect_uri
+  const getRedirectUri = useCallback(() => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    const redirectUri = `${protocol}//${host}/auth/callback`;
+    
+    console.log('Generated redirect_uri:', redirectUri);
+    console.log('Is localhost?', isLocalhost);
+    console.log('Protocol:', protocol);
+    console.log('Host:', host);
+    
+    return redirectUri;
+  }, []);
+
   // Cleanup function
   const cleanup = useCallback(() => {
     if (messageListenerRef.current) {
@@ -130,12 +145,8 @@ export default function WhatsAppEmbeddedSignup({
 
       console.log('Starting code exchange with code:', response.authResponse.code.substring(0, 20) + '...');
 
-      // Determine the redirect URI based on the current environment
-      // Important: This must match EXACTLY what's in Meta Dashboard
-      const protocol = window.location.protocol;
-      const host = window.location.host;
-      const redirectUri = `${protocol}//${host}/auth/callback`;
-
+      // Get the redirect URI using the helper function
+      const redirectUri = getRedirectUri();
       console.log('Using redirect_uri in API request:', redirectUri);
 
       // Exchange code for access token (non-async callback)
@@ -203,13 +214,36 @@ export default function WhatsAppEmbeddedSignup({
         throw new Error('Facebook SDK not loaded');
       }
 
-      // Determine the redirect URI based on the current environment
-      // Important: This must match EXACTLY what's in Meta Dashboard
-      const protocol = window.location.protocol;
-      const host = window.location.host;
-      const redirectUri = `${protocol}//${host}/auth/callback`;
+      // Check if we're on HTTPS (Facebook requires HTTPS for FB.login())
+      const isHttps = window.location.protocol === 'https:';
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      console.log('=== DEBUG: Facebook Login Requirements ===');
+      console.log('Current URL:', window.location.href);
+      console.log('Protocol:', window.location.protocol);
+      console.log('Host:', window.location.host);
+      console.log('Is HTTPS?', isHttps);
+      console.log('Is localhost?', isLocalhost);
+      console.log('==========================================');
+      
+      if (!isHttps) {
+        const errorMsg = `Facebook requires HTTPS for FB.login(). Current protocol: ${window.location.protocol}. 
+        
+        SOLUTIONS:
+        1. Use ngrok: ngrok http 3000 (creates HTTPS tunnel)
+        2. Test on Vercel: https://bank-reach-front-end.vercel.app/whatsapp/connect
+        3. Use local SSL certificate
+        
+        Without HTTPS, FB.login() will fail with: "The method FB.login can no longer be called from http pages"`;
+        throw new Error(errorMsg);
+      }
+
+      // Get the redirect URI using the helper function
+      const redirectUri = getRedirectUri();
       
       console.log('Using redirect_uri in FB.login:', redirectUri);
+      console.log('Is localhost?', isLocalhost);
+      console.log('Is HTTPS?', isHttps);
 
       // Start WhatsApp Embedded Signup flow
       FB.login(
