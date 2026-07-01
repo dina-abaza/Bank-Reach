@@ -2,23 +2,6 @@
  * WhatsApp Embedded Signup Types
  */
 
-export interface MetaTokenResponse {
-  access_token: string;
-  token_type?: string;
-  expires_in?: number;
-}
-
-export interface ExchangeCodeRequest {
-  code: string;
-  redirect_uri?: string;
-}
-
-export interface ExchangeCodeResponse {
-  success: boolean;
-  access_token?: string;
-  message?: string;
-}
-
 export type EmbeddedSignupEvent = 'FINISH' | 'CANCEL' | 'ERROR';
 
 export interface WhatsAppAssets {
@@ -57,7 +40,6 @@ export interface FacebookSDK {
       config_id: string;
       response_type: string;
       override_default_response_type: boolean;
-      redirect_uri?: string;
       extras: {
         setup: Record<string, unknown>;
       };
@@ -73,7 +55,7 @@ declare global {
   }
 }
 
-export type ConnectionStatus = 
+export type ConnectionStatus =
   | 'idle'
   | 'connecting'
   | 'success'

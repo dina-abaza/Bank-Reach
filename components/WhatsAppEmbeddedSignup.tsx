@@ -10,7 +10,7 @@ import {
 import { loadFacebookSDK } from '@/lib/facebook-sdk';
 
 interface WhatsAppEmbeddedSignupProps {
-  onSuccess?: (assets: WhatsAppAssets & { access_token: string }) => void;
+  onSuccess?: (assets: WhatsAppAssets) => void;
   onError?: (error: string) => void;
   onCancel?: () => void;
 }
@@ -23,26 +23,10 @@ export default function WhatsAppEmbeddedSignup({
   // State management
   const [status, setStatus] = useState<ConnectionStatus>('idle');
   const [error, setError] = useState<string>('');
-  const [accessToken, setAccessToken] = useState<string>('');
   const [assets, setAssets] = useState<WhatsAppAssets | null>(null);
-  
+
   // Refs for cleanup
   const messageListenerRef = useRef<((event: MessageEvent) => void) | null>(null);
-
-  // Helper function to get the correct redirect_uri
-  const getRedirectUri = useCallback(() => {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const protocol = window.location.protocol;
-    const host = window.location.host;
-    const redirectUri = `${protocol}//${host}/auth/callback`;
-    
-    console.log('Generated redirect_uri:', redirectUri);
-    console.log('Is localhost?', isLocalhost);
-    console.log('Protocol:', protocol);
-    console.log('Host:', host);
-    
-    return redirectUri;
-  }, []);
 
   // Cleanup function
   const cleanup = useCallback(() => {
@@ -55,23 +39,22 @@ export default function WhatsAppEmbeddedSignup({
   // Setup message listener for embedded signup events
   const setupMessageListener = useCallback(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Validate message origin (optional but recommended)
-      // if (event.origin !== 'https://www.facebook.com') return;
-
       try {
         const message = event.data as EmbeddedSignupMessage;
-        
+
         if (message.type === 'WA_EMBEDDED_SIGNUP') {
           console.log('WhatsApp Embedded Signup Event:', message);
 
           switch (message.event) {
-            case 'FINISH':
-              setAssets(message.data);
+            case 'FINISH': {
+              const { phone_number_id, waba_id, business_id } = message.data;
+              setAssets({ phone_number_id, waba_id, business_id });
               setStatus('success');
-              if (onSuccess && accessToken) {
-                onSuccess({ ...message.data, access_token: accessToken });
+              if (onSuccess) {
+                onSuccess({ phone_number_id, waba_id, business_id });
               }
               break;
+            }
 
             case 'CANCEL':
               setStatus('cancelled');
@@ -99,7 +82,7 @@ export default function WhatsAppEmbeddedSignup({
     messageListenerRef.current = handleMessage;
 
     return cleanup;
-  }, [accessToken, cleanup, onSuccess, onError, onCancel]);
+  }, [cleanup, onSuccess, onError, onCancel]);
 
   // Initialize Facebook SDK and setup listeners
   useEffect(() => {
@@ -129,79 +112,33 @@ export default function WhatsAppEmbeddedSignup({
   }, [setupMessageListener, cleanup, onError]);
 
   // Handle Facebook login callback
-  const handleFacebookLogin = useCallback((response: FacebookLoginResponse) => {
-    console.log('Facebook login response:', response);
-    
-    // Prevent duplicate processing
-    if (status !== 'idle') {
-      console.log('Already processing, ignoring duplicate callback');
-      return;
-    }
+  const handleFacebookLogin = useCallback(
+    (response: FacebookLoginResponse) => {
+      console.log('Facebook login response:', response);
 
-    if (response.status === 'connected' && response.authResponse?.code) {
-      // Start the exchange process
+      if (response.status !== 'connected') {
+        setStatus('failed');
+
+        const errorMessage =
+          response.status === 'not_authorized'
+            ? 'User denied authorization'
+            : 'Facebook login failed';
+
+        setError(errorMessage);
+
+        if (onError) {
+          onError(errorMessage);
+        }
+
+        return;
+      }
+
+      console.log('Embedded signup flow started successfully.');
+
       setStatus('connecting');
-      setError('');
-
-      console.log('Starting code exchange with code:', response.authResponse.code.substring(0, 20) + '...');
-
-      // Get the redirect URI using the helper function
-      const redirectUri = getRedirectUri();
-      console.log('Using redirect_uri in API request:', redirectUri);
-
-      // Exchange code for access token (non-async callback)
-      fetch('/api/whatsapp/exchange-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: response.authResponse.code,
-          redirect_uri: redirectUri,
-        }),
-      })
-        .then(async (exchangeResponse) => {
-          const data = await exchangeResponse.json();
-          console.log('Exchange response:', data);
-
-          if (!exchangeResponse.ok || !data.success) {
-            throw new Error(data.message || 'Failed to exchange authorization code');
-          }
-
-          setAccessToken(data.access_token);
-          console.log('Access token received:', data.access_token.substring(0, 20) + '...');
-          // Status will be updated by message listener when embedded signup completes
-        })
-        .catch((err) => {
-          console.error('Exchange error:', err);
-          setStatus('failed');
-          let errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-          
-          // Try to get more details from the response data
-          if (err instanceof Error && err.message.includes('authorization code')) {
-            errorMessage = `Invalid authorization code. Possible reasons:
-            1. Code expired (valid for 30 seconds only)
-            2. Incorrect App ID or App Secret
-            3. WhatsApp Business API not enabled
-            4. Configuration ID incorrect
-            5. redirect_uri not added to Meta Dashboard
-            6. redirect_uri mismatch between frontend and backend
-            7. Trailing slash difference in redirect_uri`;
-          }
-          
-          setError(errorMessage);
-          if (onError) onError(errorMessage);
-        });
-    } else {
-      console.log('Facebook login failed:', response.status);
-      setStatus('failed');
-      const errorMessage = response.status === 'not_authorized' 
-        ? 'User denied authorization'
-        : 'Facebook login failed';
-      setError(errorMessage);
-      if (onError) onError(errorMessage);
-    }
-  }, [onError, status]);
+    },
+    [onError]
+  );
 
   // Handle connect button click
   const handleConnect = useCallback(async () => {
@@ -214,54 +151,27 @@ export default function WhatsAppEmbeddedSignup({
         throw new Error('Facebook SDK not loaded');
       }
 
-      // Check if we're on HTTPS (Facebook requires HTTPS for FB.login())
+      // Facebook requires HTTPS for FB.login()
       const isHttps = window.location.protocol === 'https:';
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      
-      console.log('=== DEBUG: Facebook Login Requirements ===');
-      console.log('Current URL:', window.location.href);
-      console.log('Protocol:', window.location.protocol);
-      console.log('Host:', window.location.host);
-      console.log('Is HTTPS?', isHttps);
-      console.log('Is localhost?', isLocalhost);
-      console.log('==========================================');
-      
       if (!isHttps) {
-        const errorMsg = `Facebook requires HTTPS for FB.login(). Current protocol: ${window.location.protocol}. 
-        
-        SOLUTIONS:
-        1. Use ngrok: ngrok http 3000 (creates HTTPS tunnel)
-        2. Test on Vercel: https://bank-reach-front-end.vercel.app/whatsapp/connect
-        3. Use local SSL certificate
-        
-        Without HTTPS, FB.login() will fail with: "The method FB.login can no longer be called from http pages"`;
-        throw new Error(errorMsg);
+        throw new Error(
+          `Facebook requires HTTPS for FB.login(). Current protocol: ${window.location.protocol}.`
+        );
       }
 
-      // Get the redirect URI using the helper function
-      const redirectUri = getRedirectUri();
-      
-      console.log('Using redirect_uri in FB.login:', redirectUri);
-      console.log('Is localhost?', isLocalhost);
-      console.log('Is HTTPS?', isHttps);
-
       // Start WhatsApp Embedded Signup flow
-      FB.login(
-        handleFacebookLogin,
-        {
-          config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '',
-          response_type: 'code',
-          override_default_response_type: true,
-          redirect_uri: redirectUri,
-          extras: {
-            setup: {},
-          },
-        }
-      );
-
+      FB.login(handleFacebookLogin, {
+        config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '',
+        response_type: 'code',
+        override_default_response_type: true,
+        extras: {
+          setup: {},
+        },
+      });
     } catch (err) {
       setStatus('failed');
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start WhatsApp signup';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to start WhatsApp signup';
       setError(errorMessage);
       if (onError) onError(errorMessage);
     }
@@ -282,7 +192,6 @@ export default function WhatsAppEmbeddedSignup({
   const handleReset = useCallback(() => {
     setStatus('idle');
     setError('');
-    setAccessToken('');
     setAssets(null);
   }, []);
 
@@ -292,24 +201,31 @@ export default function WhatsAppEmbeddedSignup({
       <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-md">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
         <p className="text-gray-700 font-medium">Connecting to WhatsApp Business...</p>
-        <p className="text-gray-500 text-sm mt-2">Please wait while we establish the connection</p>
+        <p className="text-gray-500 text-sm mt-2">
+          Please complete the setup in the popup window
+        </p>
       </div>
     );
   }
 
   // Render success state
-  if (status === 'success' && assets && accessToken) {
+  if (status === 'success' && assets) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
-
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
               <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">WhatsApp Business Connected Successfully!</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              WhatsApp Business Connected Successfully!
+            </h2>
           </div>
           <button
             onClick={handleReset}
@@ -319,24 +235,7 @@ export default function WhatsAppEmbeddedSignup({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Access Token Card */}
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-700">Access Token</h3>
-              <button
-                onClick={() => copyToClipboard(accessToken)}
-                className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors"
-              >
-                Copy
-              </button>
-            </div>
-            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800 break-all">
-              {accessToken.substring(0, 30)}...
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Keep this token secure. Do not share it publicly.</p>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Phone Number ID Card */}
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
             <div className="flex items-center justify-between mb-3">
@@ -348,23 +247,39 @@ export default function WhatsAppEmbeddedSignup({
                 Copy
               </button>
             </div>
-            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800">
+            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800 break-all">
               {assets.phone_number_id}
             </div>
           </div>
 
           {/* WABA ID Card */}
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h3 className="font-semibold text-gray-700 mb-3">WABA ID</h3>
-            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-700">WABA ID</h3>
+              <button
+                onClick={() => copyToClipboard(assets.waba_id)}
+                className="px-3 py-1 text-xs font-medium text-white bg-purple-600 hover:bg-purple-700 rounded transition-colors"
+              >
+                Copy
+              </button>
+            </div>
+            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800 break-all">
               {assets.waba_id}
             </div>
           </div>
 
           {/* Business ID Card */}
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h3 className="font-semibold text-gray-700 mb-3">Business ID</h3>
-            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-700">Business ID</h3>
+              <button
+                onClick={() => copyToClipboard(assets.business_id)}
+                className="px-3 py-1 text-xs font-medium text-white bg-orange-600 hover:bg-orange-700 rounded transition-colors"
+              >
+                Copy
+              </button>
+            </div>
+            <div className="bg-white p-3 rounded border border-gray-300 font-mono text-sm text-gray-800 break-all">
               {assets.business_id}
             </div>
           </div>
@@ -374,13 +289,20 @@ export default function WhatsAppEmbeddedSignup({
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-green-800">Connection Successful</h3>
               <div className="mt-2 text-sm text-green-700">
-                <p>Your WhatsApp Business account is now connected. You can use these credentials to send and receive messages through the WhatsApp Business API.</p>
+                <p>
+                  Your WhatsApp Business account is now connected. You can use these credentials to
+                  send and receive messages through the WhatsApp Business API.
+                </p>
               </div>
             </div>
           </div>
@@ -396,12 +318,16 @@ export default function WhatsAppEmbeddedSignup({
         <div className="flex items-center mb-4">
           <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
             <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-gray-800">Connection Failed</h2>
         </div>
-        
+
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <p className="text-red-700">{error}</p>
         </div>
@@ -431,12 +357,16 @@ export default function WhatsAppEmbeddedSignup({
         <div className="flex items-center mb-4">
           <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
             <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-gray-800">Signup Cancelled</h2>
         </div>
-        
+
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <p className="text-yellow-700">The WhatsApp signup flow was cancelled by the user.</p>
         </div>
@@ -470,7 +400,8 @@ export default function WhatsAppEmbeddedSignup({
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Connect WhatsApp Business</h2>
         <p className="text-gray-600">
-          Connect your WhatsApp Business account to start sending and receiving messages through the WhatsApp Business API.
+          Connect your WhatsApp Business account to start sending and receiving messages through the
+          WhatsApp Business API.
         </p>
       </div>
 
@@ -483,7 +414,7 @@ export default function WhatsAppEmbeddedSignup({
           </div>
           <div className="ml-3">
             <p className="text-gray-700 font-medium">Facebook Login</p>
-            <p className="text-gray-500 text-sm">You will be redirected to Facebook for authentication</p>
+            <p className="text-gray-500 text-sm">Authenticate with your Facebook account</p>
           </div>
         </div>
 
@@ -495,7 +426,9 @@ export default function WhatsAppEmbeddedSignup({
           </div>
           <div className="ml-3">
             <p className="text-gray-700 font-medium">WhatsApp Business Setup</p>
-            <p className="text-gray-500 text-sm">Complete the WhatsApp Business embedded signup flow</p>
+            <p className="text-gray-500 text-sm">
+              Complete the WhatsApp Business embedded signup flow
+            </p>
           </div>
         </div>
 
@@ -507,7 +440,9 @@ export default function WhatsAppEmbeddedSignup({
           </div>
           <div className="ml-3">
             <p className="text-gray-700 font-medium">Get Credentials</p>
-            <p className="text-gray-500 text-sm">Receive your Access Token, Phone Number ID, WABA ID, and Business ID</p>
+            <p className="text-gray-500 text-sm">
+              Receive your Phone Number ID, WABA ID, and Business ID
+            </p>
           </div>
         </div>
       </div>

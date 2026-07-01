@@ -5,7 +5,7 @@ import WhatsAppEmbeddedSignup from '@/components/WhatsAppEmbeddedSignup';
 import { WhatsAppAssets } from '@/types/whatsapp';
 
 export default function WhatsAppConnectPage() {
-  const handleSuccess = (assets: WhatsAppAssets & { access_token: string }) => {
+  const handleSuccess = (assets: WhatsAppAssets) => {
     console.log('WhatsApp connection successful:', assets);
     // Here you can:
     // 1. Save to your database
@@ -66,21 +66,7 @@ export default function WhatsAppConnectPage() {
             {/* Additional Information */}
             <div className="mt-8 bg-white rounded-2xl shadow-xl p-6">
               <h3 className="text-xl font-bold text-gray-800 mb-4">What You'll Get</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <h4 className="font-semibold text-gray-700">Access Token</h4>
-                  </div>
-                  <p className="text-gray-600 text-sm">
-                    Secure token for authenticating with WhatsApp Business API. Keep this confidential.
-                  </p>
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-green-50 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
@@ -254,8 +240,8 @@ export default function WhatsAppConnectPage() {
         {/* Footer Note */}
         <div className="mt-12 text-center">
           <p className="text-gray-500 text-sm">
-            This integration uses WhatsApp Embedded Signup and Meta Graph API v25.0.
-            All credentials are handled securely and never exposed to the client.
+            This integration uses the official Meta WhatsApp Embedded Signup event-driven flow.
+            Your Phone Number ID, WABA ID, and Business ID are delivered securely via the WA_EMBEDDED_SIGNUP event.
           </p>
           <p className="text-gray-400 text-xs mt-2">
             © {new Date().getFullYear()} Bank Reach. All rights reserved.
