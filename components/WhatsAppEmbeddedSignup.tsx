@@ -46,15 +46,35 @@ export default function WhatsAppEmbeddedSignup({
           console.log('WhatsApp Embedded Signup Event:', message);
 
           switch (message.event) {
-            case 'FINISH': {
-              const { phone_number_id, waba_id, business_id } = message.data;
-              setAssets({ phone_number_id, waba_id, business_id });
-              setStatus('success');
-              if (onSuccess) {
-                onSuccess({ phone_number_id, waba_id, business_id });
-              }
-              break;
-            }
+           case 'FINISH': {
+  console.log('Embedded Signup Finished');
+  console.log('Full message:', message);
+  console.log('Message data:', message.data);
+
+  const { phone_number_id, waba_id, business_id } = message.data;
+
+  console.log('Phone Number ID:', phone_number_id);
+  console.log('WABA ID:', waba_id);
+  console.log('Business ID:', business_id);
+
+  setAssets({
+    phone_number_id,
+    waba_id,
+    business_id,
+  });
+
+  setStatus('success');
+
+  if (onSuccess) {
+    onSuccess({
+      phone_number_id,
+      waba_id,
+      business_id,
+    });
+  }
+
+  break;
+}
 
             case 'CANCEL':
               setStatus('cancelled');
