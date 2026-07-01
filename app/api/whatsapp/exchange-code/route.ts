@@ -22,7 +22,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
     const clientId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
     const clientSecret = process.env.FACEBOOK_APP_SECRET;
     const apiVersion = process.env.NEXT_PUBLIC_FACEBOOK_API_VERSION || 'v25.0';
-    const defaultRedirectUri = process.env.REDIRECT_URI;
 
     // Validate environment variables
     if (!clientId) {
@@ -47,17 +46,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
       );
     }
 
-    // Determine the redirect_uri to use
-    const finalRedirectUri = (redirect_uri && typeof redirect_uri === 'string' && redirect_uri.trim() !== '') 
-      ? redirect_uri.trim() 
-      : defaultRedirectUri;
-
-    if (!finalRedirectUri) {
-      console.error('No redirect_uri available');
+    // Validate redirect_uri from frontend
+    if (!redirect_uri || typeof redirect_uri !== 'string' || redirect_uri.trim() === '') {
+      console.error('Missing or invalid redirect_uri from frontend');
       return NextResponse.json(
         {
           success: false,
-          message: 'No redirect_uri available',
+          message: 'Missing redirect_uri',
         },
         { status: 400 }
       );
@@ -65,7 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
 
     // Normalize the redirect_uri to ensure consistency
     // Remove trailing slash if present (except for root path)
-    const normalizedRedirectUri = finalRedirectUri.replace(/\/$/, '');
+    const normalizedRedirectUri = redirect_uri.trim().replace(/\/$/, '');
     
     console.log('Using redirect_uri in backend:', normalizedRedirectUri);
     console.log('Original redirect_uri from frontend:', redirect_uri);
@@ -138,7 +133,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ExchangeC
             clientId: clientId,
             apiVersion: apiVersion,
             codeLength: code.trim().length,
-            redirectUri: finalRedirectUri,
+            redirectUri: normalizedRedirectUri,
           }
         },
         { status: response.status }
