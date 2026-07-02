@@ -183,12 +183,16 @@ export default function WhatsAppEmbeddedSignup({
       }
 
       // Start WhatsApp Embedded Signup flow
+      // session_info_version and featurebits are required by Meta to keep the
+      // popup open and render the WhatsApp Business setup steps after login.
       FB.login(handleFacebookLogin, {
         config_id: process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID || '',
         response_type: 'code',
         override_default_response_type: true,
         extras: {
           setup: {},
+          featurebits: 'feature_whatsapp_embedded_signup',
+          session_info_version: 2,
         },
       });
     } catch (err) {

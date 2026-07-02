@@ -42,6 +42,8 @@ export interface FacebookSDK {
       override_default_response_type: boolean;
       extras: {
         setup: Record<string, unknown>;
+        featurebits?: string;
+        session_info_version?: number;
       };
     }
   ) => void;
