@@ -71,7 +71,7 @@ export default function TemplateForm({ onSubmit, onCancel, initialData = null })
               key={v}
               type="button"
               onClick={() => insertVariable(v)}
-              className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-mono text-blue-700 hover:bg-blue-100 transition-colors border border-blue-200"
+              className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-mono text-brand-700 hover:bg-brand-100 transition-colors border border-brand-200"
             >
               {`{{${v}}}`}
             </button>

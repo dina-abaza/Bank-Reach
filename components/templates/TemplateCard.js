@@ -40,7 +40,7 @@ export default function TemplateCard({ template, onEdit, onDelete }) {
           {/* قلم التعديل */}
           <button
             onClick={() => onEdit(template)}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-blue-50 hover:text-blue-500 transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-brand-50 hover:text-brand-700 transition-colors"
             title="تعديل القالب"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -42,7 +42,7 @@ const MessageIcon = () => (
 );
 
 const messageBreakdown = [
-  { label: 'أُرسلت بنجاح',      key: 'sent',      color: 'text-blue-600' },
+  { label: 'أُرسلت بنجاح',      key: 'sent',      color: 'text-brand-700' },
   { label: 'وُصّلت للمستلم',    key: 'delivered',  color: 'text-green-600' },
   { label: 'قُرئت من المستلم',  key: 'read',       color: 'text-purple-600' },
   { label: 'فشل الإرسال',       key: 'failed',     color: 'text-red-600' },

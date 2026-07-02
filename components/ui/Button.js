@@ -1,11 +1,12 @@
 import Spinner from './Spinner';
 
 const variants = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+  primary: 'bg-brand-700 text-white shadow-sm hover:bg-brand-800 focus:ring-brand-600',
   secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 focus:ring-slate-400',
+  gold: 'bg-accent-500 text-white shadow-sm hover:bg-accent-600 focus:ring-accent-400',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
   ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 focus:ring-slate-400',
-  outline: 'border border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+  outline: 'border border-brand-700 text-brand-700 hover:bg-brand-50 focus:ring-brand-600',
   success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
 };
 

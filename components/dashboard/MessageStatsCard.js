@@ -1,7 +1,7 @@
 function ProgressBar({ value, max, color }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
   const colors = {
-    blue:   'bg-blue-500',
+    blue:   'bg-brand-600',
     green:  'bg-green-500',
     purple: 'bg-purple-500',
     red:    'bg-red-500',

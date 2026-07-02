@@ -52,24 +52,24 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <aside
       className={`
-        flex h-screen w-64 shrink-0 flex-col bg-slate-900 text-white
+        flex h-screen w-64 shrink-0 flex-col bg-brand-900 text-white
         fixed right-0 top-0 z-50 transform transition-transform duration-300 ease-in-out
         md:static md:translate-x-0 md:transition-none
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
       `}
     >
-      <div className="flex items-center gap-3 border-b border-slate-700/50 px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm">
+      <div className="flex items-center gap-3 border-b border-white/10 px-6 py-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500 text-white font-bold text-sm">
           BR
         </div>
         <div>
           <p className="text-sm font-semibold text-white">BizReach</p>
-          <p className="text-xs text-slate-400">منصة التواصل التجاري</p>
+          <p className="text-xs text-white/50">منصة التواصل التجاري</p>
         </div>
         {/* زر الإغلاق على الموبايل فقط */}
         <button
           onClick={onClose}
-          className="mr-auto flex h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-white transition-colors md:hidden"
+          className="mr-auto flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white transition-colors md:hidden"
           aria-label="إغلاق القائمة"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -89,10 +89,10 @@ export default function Sidebar({ isOpen, onClose }) {
               href={item.href}
               onClick={onClose}
               className={`
-                flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+                flex items-center gap-3 rounded-lg border-r-2 px-3 py-2.5 text-sm font-medium transition-colors
                 ${isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  ? 'border-accent-500 bg-white/10 text-white'
+                  : 'border-transparent text-white/60 hover:bg-white/5 hover:text-white'
                 }
               `}
             >
@@ -103,21 +103,21 @@ export default function Sidebar({ isOpen, onClose }) {
         })}
       </nav>
 
-      <div className="border-t border-slate-700/50 p-4">
+      <div className="border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3 px-1">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-slate-200">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent-500/40 bg-white/5 text-xs font-semibold text-accent-300">
             {user?.name?.[0]?.toUpperCase() || 'A'}
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-white">{user?.name || 'المستخدم'}</p>
-            <p className="truncate text-xs text-slate-400">
+            <p className="truncate text-xs text-white/50">
               {user?.role === 'admin' ? 'Admin' : 'موظف'}
             </p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/50 hover:bg-white/5 hover:text-white transition-colors"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -125,7 +125,7 @@ export default function Sidebar({ isOpen, onClose }) {
           تسجيل الخروج
         </button>
 
-        <div className="mt-6 flex flex-wrap justify-center gap-x-3 gap-y-2 text-[10px] text-slate-500">
+        <div className="mt-6 flex flex-wrap justify-center gap-x-3 gap-y-2 text-[10px] text-white/40">
           <Link href="/privacy" className="hover:text-white transition-colors">الخصوصية</Link>
           <Link href="/terms" className="hover:text-white transition-colors">الشروط</Link>
           <Link href="/data-deletion" className="hover:text-white transition-colors">حذف البيانات</Link>

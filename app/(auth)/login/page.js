@@ -30,7 +30,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-lg">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white font-bold text-lg">
           BR
         </div>
         <h1 className="text-2xl font-bold text-slate-900">BizReach</h1>
@@ -70,13 +70,13 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs font-medium text-slate-500">
-        <Link href="/privacy" className="hover:text-blue-600 transition-colors">سياسة الخصوصية</Link>
+        <Link href="/privacy" className="hover:text-brand-700 transition-colors">سياسة الخصوصية</Link>
         <span className="text-slate-300">•</span>
-        <Link href="/terms" className="hover:text-blue-600 transition-colors">شروط الخدمة</Link>
+        <Link href="/terms" className="hover:text-brand-700 transition-colors">شروط الخدمة</Link>
         <span className="text-slate-300">•</span>
-        <Link href="/data-deletion" className="hover:text-blue-600 transition-colors">حذف البيانات</Link>
+        <Link href="/data-deletion" className="hover:text-brand-700 transition-colors">حذف البيانات</Link>
         <span className="text-slate-300">•</span>
-        <Link href="/contact" className="hover:text-blue-600 transition-colors">اتصل بنا</Link>
+        <Link href="/contact" className="hover:text-brand-700 transition-colors">اتصل بنا</Link>
       </div>
     </div>
   );

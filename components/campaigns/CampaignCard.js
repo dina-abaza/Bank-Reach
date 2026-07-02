@@ -65,7 +65,7 @@ export default function CampaignCard({ campaign, onTrigger, onEdit, onDelete, on
       {/* إحصائيات الرسائل */}
       <div className="mb-4 grid grid-cols-5 gap-1 overflow-hidden rounded-xl bg-slate-50 p-2">
         <StatItem label="الإجمالي" value={campaign.stats?.total} />
-        <StatItem label="أُرسل"    value={campaign.stats?.sent}      color="text-blue-600"   />
+        <StatItem label="أُرسل"    value={campaign.stats?.sent}      color="text-brand-700"   />
         <StatItem label="وُصّل"    value={campaign.stats?.delivered}  color="text-green-600"  />
         <StatItem label="قُرئ"     value={campaign.stats?.read}       color="text-purple-600" />
         <StatItem label="فشل"      value={campaign.stats?.failed}     color="text-red-600"    />
@@ -73,14 +73,14 @@ export default function CampaignCard({ campaign, onTrigger, onEdit, onDelete, on
 
       {/* شريط التقدم اللحظي */}
       {campaign.status === 'running' && progress && (
-        <div className="mb-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
-          <div className="mb-1.5 flex justify-between text-xs text-blue-700">
+        <div className="mb-3 rounded-lg border border-brand-100 bg-brand-50 p-3">
+          <div className="mb-1.5 flex justify-between text-xs text-brand-700">
             <span>جارٍ الإرسال...</span>
             <span>{progress.processed?.toLocaleString('ar-EG')} / {progress.total?.toLocaleString('ar-EG')}</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-blue-200">
+          <div className="h-1.5 overflow-hidden rounded-full bg-brand-200">
             <div
-              className="h-full rounded-full bg-blue-500 transition-all duration-500"
+              className="h-full rounded-full bg-brand-600 transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -105,7 +105,7 @@ export default function CampaignCard({ campaign, onTrigger, onEdit, onDelete, on
 
           <button
             onClick={() => onEdit(campaign)}
-            className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-slate-500 hover:bg-brand-50 hover:text-brand-700 transition-colors"
             title="تعديل الحملة"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

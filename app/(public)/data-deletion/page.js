@@ -12,8 +12,8 @@ export default function DataDeletionPage() {
           نحن نحترم حقك في التحكم في بياناتك الشخصية. إذا كنت ترغب في حذف بياناتك من منصة BankReach بشكل نهائي، يرجى اتباع التعليمات التالية.
         </p>
 
-        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-6">
-          <h2 className="text-lg font-bold text-blue-900 mb-4">كيفية طلب حذف البيانات:</h2>
+        <div className="bg-brand-50/50 border border-brand-100 rounded-xl p-6">
+          <h2 className="text-lg font-bold text-brand-900 mb-4">كيفية طلب حذف البيانات:</h2>
           <p className="text-slate-700 mb-5">
             لحذف حسابك وكافة بياناتك المرتبطة به، يمكنك التواصل مع المطور مباشرة لتقديم الطلب من خلال إحدى الطرق التالية:
           </p>
@@ -25,21 +25,21 @@ export default function DataDeletionPage() {
               </div>
               <div>
                 <div className="text-sm font-semibold text-slate-500 mb-1">رقم الواتساب</div>
-                <a href="https://wa.me/201556299599" dir="ltr" className="text-blue-600 font-bold hover:underline">
+                <a href="https://wa.me/201556299599" dir="ltr" className="text-brand-700 font-bold hover:underline">
                   01556299599
                 </a>
               </div>
             </div>
 
             <div className="flex items-center gap-4 bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
-              <div className="h-10 w-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+              <div className="h-10 w-10 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <div>
                 <div className="text-sm font-semibold text-slate-500 mb-1">البريد الإلكتروني</div>
-                <a href="mailto:ramadanmahdy45@gmail.com" className="text-blue-600 font-bold hover:underline">
+                <a href="mailto:ramadanmahdy45@gmail.com" className="text-brand-700 font-bold hover:underline">
                   ramadanmahdy45@gmail.com
                 </a>
               </div>

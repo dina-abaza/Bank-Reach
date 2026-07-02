@@ -4,7 +4,7 @@ export default function CampaignStatsRow({ stats }) {
   const items = [
     { label: 'الإجمالي', value: stats.total,     color: 'text-slate-700' },
     { label: 'مسودة',    value: stats.draft,      color: 'text-slate-500' },
-    { label: 'مجدولة',   value: stats.scheduled,  color: 'text-blue-600'  },
+    { label: 'مجدولة',   value: stats.scheduled,  color: 'text-brand-700' },
     { label: 'جارية',    value: stats.running,    color: 'text-yellow-600' },
     { label: 'منتهية',   value: stats.completed,  color: 'text-green-600' },
     { label: 'فاشلة',    value: stats.failed,     color: 'text-red-600'   },

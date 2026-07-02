@@ -7,7 +7,7 @@ export default function Spinner({ size = 'md', className = '' }) {
 
   return (
     <div
-      className={`animate-spin rounded-full border-blue-600 border-t-transparent ${sizes[size]} ${className}`}
+      className={`animate-spin rounded-full border-brand-700 border-t-transparent ${sizes[size]} ${className}`}
     />
   );
 }

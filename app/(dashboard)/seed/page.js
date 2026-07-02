@@ -57,7 +57,7 @@ export default function SeedPage() {
       {/* ملخص ما سيُضاف */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'عملاء', count: SEED_CUSTOMERS.length, color: 'bg-blue-50 text-blue-700' },
+          { label: 'عملاء', count: SEED_CUSTOMERS.length, color: 'bg-brand-50 text-brand-700' },
           { label: 'قوالب', count: SEED_TEMPLATES.length, color: 'bg-purple-50 text-purple-700' },
           { label: 'حملات', count: SEED_CAMPAIGNS.length, color: 'bg-green-50 text-green-700' },
         ].map((item) => (

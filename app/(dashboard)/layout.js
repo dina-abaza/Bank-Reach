@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }) {
               </svg>
             </button>
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-white font-bold text-xs">
+              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-brand-700 text-white font-bold text-xs">
                 BR
               </div>
               <span className="text-sm font-semibold text-slate-800">BizReach</span>

@@ -50,11 +50,11 @@ export default function ImportExcelModal({ onImport, onCancel }) {
               </p>
               <p className="mt-1 text-xs text-green-600">تم الاستيراد</p>
             </div>
-            <div className="rounded-lg border border-blue-200 bg-white p-3">
-              <p className="text-2xl font-bold text-blue-700">
+            <div className="rounded-lg border border-brand-200 bg-white p-3">
+              <p className="text-2xl font-bold text-brand-700">
                 {result.updated?.toLocaleString('ar-EG')}
               </p>
-              <p className="mt-1 text-xs text-blue-600">تم التحديث</p>
+              <p className="mt-1 text-xs text-brand-600">تم التحديث</p>
             </div>
             <div className="rounded-lg border border-red-200 bg-white p-3">
               <p className="text-2xl font-bold text-red-700">
@@ -67,7 +67,7 @@ export default function ImportExcelModal({ onImport, onCancel }) {
       ) : (
         <div
           onClick={() => inputRef.current?.click()}
-          className="cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-10 text-center transition-colors hover:border-blue-400 hover:bg-blue-50"
+          className="cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-10 text-center transition-colors hover:border-brand-400 hover:bg-brand-50"
         >
           <svg className="mx-auto mb-3 h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

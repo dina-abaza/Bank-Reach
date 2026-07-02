@@ -91,7 +91,7 @@ export default function CampaignDetails({ campaign: initial, liveProgress }) {
         <p className="mb-3 text-xs font-medium text-slate-500">إحصائيات الرسائل</p>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
           <StatBox label="الإجمالي" value={stats.total} />
-          <StatBox label="أُرسل"    value={stats.sent}      color="text-blue-600"   />
+          <StatBox label="أُرسل"    value={stats.sent}      color="text-brand-700"   />
           <StatBox label="وُصّل"    value={stats.delivered}  color="text-green-600"  />
           <StatBox label="قُرئ"     value={stats.read}       color="text-purple-600" />
           <StatBox label="فشل"      value={stats.failed}    color="text-red-600"    />
@@ -100,14 +100,14 @@ export default function CampaignDetails({ campaign: initial, liveProgress }) {
 
       {/* شريط التقدم اللحظي */}
       {progress && (
-        <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
-          <div className="mb-2 flex justify-between text-sm text-blue-700">
+        <div className="rounded-xl border border-brand-100 bg-brand-50 p-4">
+          <div className="mb-2 flex justify-between text-sm text-brand-700">
             <span className="font-medium">جارٍ الإرسال...</span>
             <span>{progress.processed?.toLocaleString('ar-EG')} / {progress.total?.toLocaleString('ar-EG')}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-blue-200">
+          <div className="h-2 overflow-hidden rounded-full bg-brand-200">
             <div
-              className="h-full rounded-full bg-blue-500 transition-all duration-500"
+              className="h-full rounded-full bg-brand-600 transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           </div>
