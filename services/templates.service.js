@@ -11,6 +11,11 @@ export const templatesService = {
     return response.data;
   },
 
+  async getMeta() {
+    const response = await api.get('/templates/meta');
+    return response.data;
+  },
+
   async create(data) {
     const response = await api.post('/templates', data);
     return response.data;

@@ -5,6 +5,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
+import Badge from '@/components/ui/Badge';
 import { ModalFooter } from '@/components/ui/Modal';
 
 const GROUP_OPTIONS = [
@@ -32,6 +33,7 @@ export default function CampaignForm({ templates = [], onSubmit, onCancel, initi
   const [error, setError]     = useState(null);
 
   const templateOptions = templates.map((t) => ({ value: t.id, label: t.name }));
+  const selectedTemplate = templates.find((t) => t.id === form.templateId) || null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,6 +87,22 @@ export default function CampaignForm({ templates = [], onSubmit, onCancel, initi
         placeholder="اختر قالباً..."
         required
       />
+
+      {selectedTemplate && (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <p className="mb-2 text-xs font-medium text-slate-500">معاينة الرسالة (قالب Meta)</p>
+          <p className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-slate-700">
+            {selectedTemplate.body}
+          </p>
+          {selectedTemplate.variables?.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {selectedTemplate.variables.map((v) => (
+                <Badge key={v} variant="blue">{`{{${v}}}`}</Badge>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <Select
         label="الفئة المستهدفة"

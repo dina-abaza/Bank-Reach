@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useCampaigns } from '@/hooks/use-campaigns';
-import { useTemplates } from '@/hooks/use-templates';
+import { useMetaTemplates } from '@/hooks/use-meta-templates';
 import { useCampaignSocket } from '@/hooks/use-campaign-socket';
 import Header from '@/components/layout/Header';
 import CampaignCard from '@/components/campaigns/CampaignCard';
@@ -19,7 +19,7 @@ export default function CampaignsPage() {
     createCampaign, updateCampaign, deleteCampaign, triggerCampaign,
     applySocketUpdate,
   } = useCampaigns();
-  const { templates } = useTemplates();
+  const { metaTemplates } = useMetaTemplates();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCampaign,  setEditingCampaign]  = useState(null);
@@ -138,13 +138,13 @@ export default function CampaignsPage() {
 
       {/* مودال الإنشاء */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="إنشاء حملة جديدة" size="lg">
-        <CampaignForm templates={templates} onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} />
+        <CampaignForm templates={metaTemplates} onSubmit={handleCreate} onCancel={() => setShowCreateModal(false)} />
       </Modal>
 
       {/* مودال التعديل */}
       <Modal isOpen={!!editingCampaign} onClose={() => setEditingCampaign(null)} title="تعديل الحملة" size="lg">
         <CampaignForm
-          templates={templates}
+          templates={metaTemplates}
           initialData={editingCampaign}
           onSubmit={handleEdit}
           onCancel={() => setEditingCampaign(null)}
