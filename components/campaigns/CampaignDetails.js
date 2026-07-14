@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { campaignsService } from '@/services/campaigns.service';
 import CampaignStatusBadge from './CampaignStatusBadge';
+import TemplateCategoryBadge from '@/components/templates/TemplateCategoryBadge';
 import Spinner from '@/components/ui/Spinner';
 
 function formatDate(dateStr) {
@@ -73,7 +74,10 @@ export default function CampaignDetails({ campaign: initial, liveProgress }) {
       {hasTemplate ? (
         <div className="rounded-xl border border-slate-200 p-4">
           <p className="mb-1 text-xs font-medium text-slate-500">القالب المستخدم</p>
-          <p className="font-medium text-slate-700">{campaign.template.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-slate-700">{campaign.template.name}</p>
+            <TemplateCategoryBadge category={campaign.template.category} />
+          </div>
           {campaign.template.body && (
             <p className="mt-2 whitespace-pre-wrap rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-600 leading-relaxed">
               {campaign.template.body}

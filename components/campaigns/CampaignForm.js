@@ -6,6 +6,7 @@ import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import Alert from '@/components/ui/Alert';
 import Badge from '@/components/ui/Badge';
+import TemplateCategoryBadge from '@/components/templates/TemplateCategoryBadge';
 import { ModalFooter } from '@/components/ui/Modal';
 
 const GROUP_OPTIONS = [
@@ -32,7 +33,11 @@ export default function CampaignForm({ templates = [], onSubmit, onCancel, initi
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
 
-  const templateOptions = templates.map((t) => ({ value: t.id, label: t.name }));
+  const categoryLabels = { MARKETING: 'تسويقي', UTILITY: 'خدمي' };
+  const templateOptions = templates.map((t) => ({
+    value: t.id,
+    label: categoryLabels[t.category] ? `${t.name} (${categoryLabels[t.category]})` : t.name,
+  }));
   const selectedTemplate = templates.find((t) => t.id === form.templateId) || null;
 
   const handleChange = (e) => {
@@ -90,7 +95,10 @@ export default function CampaignForm({ templates = [], onSubmit, onCancel, initi
 
       {selectedTemplate && (
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-          <p className="mb-2 text-xs font-medium text-slate-500">معاينة الرسالة (قالب Meta)</p>
+          <div className="mb-2 flex items-center gap-2">
+            <p className="text-xs font-medium text-slate-500">معاينة الرسالة (قالب Meta)</p>
+            <TemplateCategoryBadge category={selectedTemplate.category} />
+          </div>
           <p className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-slate-700">
             {selectedTemplate.body}
           </p>
