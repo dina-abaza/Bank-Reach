@@ -17,7 +17,7 @@ export default function CampaignsPage() {
   const {
     campaigns, loading, error,
     createCampaign, updateCampaign, deleteCampaign, triggerCampaign,
-    applySocketUpdate,
+    applySocketUpdate, applySocketStats,
   } = useCampaigns();
   const { metaTemplates } = useMetaTemplates();
 
@@ -94,6 +94,25 @@ export default function CampaignsPage() {
           : prev
       );
     },
+    onStats: (data) => {
+      const cid = data.campaignId || data.id;
+      applySocketStats(data);
+      setDetailsCampaign((prev) =>
+        prev?.id === cid
+          ? {
+              ...prev,
+              stats: {
+                ...prev.stats,
+                total:     data.totalMessages ?? data.total,
+                sent:      data.sent,
+                delivered: data.delivered,
+                read:      data.read,
+                failed:    data.failed,
+              },
+            }
+          : prev
+      );
+    },
   });
 
   return (
@@ -157,6 +176,7 @@ export default function CampaignsPage() {
           <CampaignDetails
             campaign={detailsCampaign}
             liveProgress={detailsCampaign._progress}
+            liveStats={detailsCampaign.stats}
           />
         )}
       </Modal>

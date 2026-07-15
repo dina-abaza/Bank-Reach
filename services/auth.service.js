@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { disconnectWebSocket } from '@/lib/socket';
 
 export const authService = {
   async login(email, password) {
@@ -11,6 +12,7 @@ export const authService = {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
+      disconnectWebSocket();
     }
   },
 

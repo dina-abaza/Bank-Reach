@@ -71,6 +71,21 @@ export function useCampaigns(initialParams = {}) {
     );
   }, []);
 
+  // تحديث إحصائيات حملة واحدة لحظيًا (من حدث campaign-stats)
+  const applySocketStats = useCallback((data) => {
+    const cid = data.campaignId || data.id;
+    const stats = {
+      total:     data.totalMessages ?? data.total,
+      sent:      data.sent,
+      delivered: data.delivered,
+      read:      data.read,
+      failed:    data.failed,
+    };
+    setCampaigns((prev) =>
+      prev.map((c) => (c.id === cid ? { ...c, stats: { ...c.stats, ...stats } } : c))
+    );
+  }, []);
+
   return {
     campaigns,
     pagination,
@@ -83,6 +98,7 @@ export function useCampaigns(initialParams = {}) {
     deleteCampaign,
     triggerCampaign,
     applySocketUpdate,
+    applySocketStats,
     refresh: () => fetchCampaigns(params),
   };
 }

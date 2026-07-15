@@ -30,7 +30,7 @@ const groupLabels = {
   TRANSFERRED: 'المحولون',
 };
 
-export default function CampaignDetails({ campaign: initial, liveProgress }) {
+export default function CampaignDetails({ campaign: initial, liveProgress, liveStats }) {
   const [campaign, setCampaign] = useState(initial);
   const [loading,  setLoading]  = useState(true);
 
@@ -46,7 +46,7 @@ export default function CampaignDetails({ campaign: initial, liveProgress }) {
     return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
   }
 
-  const stats = campaign.stats ?? {};
+  const stats = { ...campaign.stats, ...liveStats };
   const progress = liveProgress || campaign._progress;
   const pct = progress?.total > 0
     ? Math.round((progress.processed / progress.total) * 100)
