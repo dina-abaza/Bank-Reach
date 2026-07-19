@@ -3,12 +3,14 @@
 import { useEffect, useRef } from 'react';
 import { initWebSocket, joinCampaignRoom } from '@/lib/socket';
 
-export function useCampaignSocket({ onUpdate, onStats } = {}) {
+export function useCampaignSocket({ campaignIds = [], onUpdate, onStats } = {}) {
   // refs تمنع مشكلة الـ stale closure
   const onUpdateRef = useRef(onUpdate);
   const onStatsRef  = useRef(onStats);
+  const campaignIdsRef = useRef(campaignIds);
   useEffect(() => { onUpdateRef.current = onUpdate; }, [onUpdate]);
   useEffect(() => { onStatsRef.current  = onStats;  }, [onStats]);
+  useEffect(() => { campaignIdsRef.current = campaignIds; }, [campaignIds]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -24,10 +26,14 @@ export function useCampaignSocket({ onUpdate, onStats } = {}) {
     socket.on('campaign-global-update', handleUpdate);
     socket.on('campaign-stats',         handleStats);
 
-    // انضمام لغرف الحملات الخاصة بالمستخدم
+    // campaign-stats و message-update بيتبعتوا من السيرفر لغرفة الحملة
+    // (campaign:<id>) فقط، مش لغرفة اليوزر — لازم ننضم لكل غرفة حملة بنفسنا
+    const joinAllRooms = () => campaignIdsRef.current.forEach((id) => id && joinCampaignRoom(id));
+
     const onConnect = () => {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       if (user.id) socket.emit('subscribe-user-campaigns', user.id);
+      joinAllRooms();
     };
 
     if (socket.connected) {
@@ -43,6 +49,11 @@ export function useCampaignSocket({ onUpdate, onStats } = {}) {
       socket.off('connect',               onConnect);
     };
   }, []);
+
+  // انضمام فوري لأي حملة جديدة تتضاف للقائمة من غير ما ننتظر إعادة اتصال
+  useEffect(() => {
+    campaignIds.forEach((id) => id && joinCampaignRoom(id));
+  }, [campaignIds]);
 
   return { joinCampaignRoom };
 }

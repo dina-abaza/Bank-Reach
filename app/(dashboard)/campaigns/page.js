@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { useMetaTemplates } from '@/hooks/use-meta-templates';
 import { useCampaignSocket } from '@/hooks/use-campaign-socket';
@@ -83,8 +83,13 @@ export default function CampaignsPage() {
     }
   };
 
+  // الحملات المعروضة حاليًا — لازم ننضم لغرفة كل واحدة فيهم عشان نستقبل
+  // تحديثاتها اللحظية (campaign-stats / message-update بيتبعتوا لغرفة الحملة فقط)
+  const campaignIds = useMemo(() => campaigns.map((c) => c.id), [campaigns]);
+
   // WebSocket — نداء واحد فقط يجمع تحديث القائمة + مودال التفاصيل
   useCampaignSocket({
+    campaignIds,
     onUpdate: (data) => {
       const cid = data.campaignId || data.id;
       applySocketUpdate(data);
@@ -103,11 +108,11 @@ export default function CampaignsPage() {
               ...prev,
               stats: {
                 ...prev.stats,
-                total:     data.totalMessages ?? data.total,
-                sent:      data.sent,
-                delivered: data.delivered,
-                read:      data.read,
-                failed:    data.failed,
+                total:     data.totalCustomers    ?? data.totalMessages ?? data.total,
+                sent:      data.sentMessages      ?? data.sent,
+                delivered: data.deliveredMessages ?? data.delivered,
+                read:      data.readMessages      ?? data.read,
+                failed:    data.failedMessages    ?? data.failed,
               },
             }
           : prev

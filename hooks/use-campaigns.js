@@ -72,14 +72,15 @@ export function useCampaigns(initialParams = {}) {
   }, []);
 
   // تحديث إحصائيات حملة واحدة لحظيًا (من حدث campaign-stats)
+  // الباك إند بيبعت أسماء طويلة (sentMessages, totalCustomers...) في هذا الحدث
   const applySocketStats = useCallback((data) => {
     const cid = data.campaignId || data.id;
     const stats = {
-      total:     data.totalMessages ?? data.total,
-      sent:      data.sent,
-      delivered: data.delivered,
-      read:      data.read,
-      failed:    data.failed,
+      total:     data.totalCustomers   ?? data.totalMessages ?? data.total,
+      sent:      data.sentMessages     ?? data.sent,
+      delivered: data.deliveredMessages ?? data.delivered,
+      read:      data.readMessages     ?? data.read,
+      failed:    data.failedMessages   ?? data.failed,
     };
     setCampaigns((prev) =>
       prev.map((c) => (c.id === cid ? { ...c, stats: { ...c.stats, ...stats } } : c))
