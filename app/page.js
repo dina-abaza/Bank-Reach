@@ -81,7 +81,7 @@ export default function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 via-slate-50 to-slate-50" />
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 py-20 text-center md:py-28">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 py-12 text-center md:py-16">
             <span className="mb-6 rounded-full border border-accent-300 bg-accent-50 px-4 py-1.5 text-sm font-medium text-accent-800">
               منصة إدارة تحصيل وتواصل العملاء
             </span>
@@ -110,36 +110,43 @@ export default function HomePage() {
         </section>
 
         {/* Features */}
-        <section className="mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
+        <section className="mx-auto w-full max-w-6xl px-6 py-10 md:py-14">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-slate-900">كل ما تحتاجه لإدارة التحصيل في مكان واحد</h2>
             <p className="mt-3 text-slate-600">من استيراد البيانات إلى إرسال الحملات ومتابعة النتائج.</p>
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f, i) => (
-              <div
-                key={f.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-md"
-              >
+            {features.map((f, i) => {
+              const shapes = [
+                'rounded-2xl rounded-bl-none -rotate-3',
+                'rounded-2xl rounded-tr-none rotate-3',
+                'rounded-2xl rounded-tl-none -rotate-2',
+              ];
+              return (
                 <div
-                  className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl ${
-                    i % 3 === 2 ? 'bg-accent-100 text-accent-700' : 'bg-brand-100 text-brand-700'
-                  }`}
+                  key={f.title}
+                  className="rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-md"
                 >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    {f.icon}
-                  </svg>
+                  <div
+                    className={`mb-5 flex h-12 w-12 items-center justify-center transition-transform duration-300 hover:rotate-0 ${shapes[i % 3]} ${
+                      i % 3 === 2 ? 'bg-accent-100 text-accent-700' : 'bg-brand-100 text-brand-700'
+                    }`}
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      {f.icon}
+                    </svg>
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-slate-800">{f.title}</h3>
+                  <p className="text-sm leading-relaxed text-slate-600">{f.desc}</p>
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-slate-800">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-600">{f.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
         {/* How it works */}
-        <section className="border-y border-slate-200 bg-white py-16 md:py-20">
+        <section className="border-y border-slate-200 bg-white py-12 md:py-16">
           <div className="mx-auto w-full max-w-6xl px-6">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-bold text-slate-900">تعمل في ثلاث خطوات بسيطة</h2>
@@ -158,7 +165,7 @@ export default function HomePage() {
         </section>
 
         {/* CTA */}
-        <section className="mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
+        <section className="mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
           <div className="relative flex flex-col items-center justify-between gap-8 overflow-hidden rounded-3xl bg-gradient-to-l from-brand-900 to-brand-700 px-8 py-12 text-center md:flex-row md:text-right">
             <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-accent-500/10" />
             <div className="relative">
