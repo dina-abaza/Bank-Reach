@@ -1,10 +1,9 @@
-export default function StatsCard({ title, value, subtitle, icon, color = 'blue' }) {
+export default function StatsCard({ title, value, subtitle, icon, color = 'brand' }) {
   const colors = {
-    blue: 'bg-brand-50 text-brand-700',
+    brand: 'bg-brand-50 text-brand-700',
+    gold: 'bg-accent-50 text-accent-700',
     green: 'bg-green-50 text-green-600',
-    yellow: 'bg-yellow-50 text-yellow-600',
     red: 'bg-red-50 text-red-600',
-    purple: 'bg-purple-50 text-purple-600',
     slate: 'bg-slate-100 text-slate-600',
   };
 

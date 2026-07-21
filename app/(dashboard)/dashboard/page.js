@@ -77,20 +77,20 @@ export default function DashboardPage() {
           value={dashboard?.totalCustomers}
           subtitle={`${(dashboard?.totalGroups ?? 0).toLocaleString('ar-EG')} مجموعات`}
           icon={<CustomerIcon />}
-          color="blue"
+          color="brand"
         />
         <StatsCard
           title="القوالب"
           value={dashboard?.totalTemplates}
           icon={<TemplateIcon />}
-          color="purple"
+          color="gold"
         />
         <StatsCard
           title="الحملات"
           value={dashboard?.totalCampaigns?.total}
           subtitle={`${(dashboard?.totalCampaigns?.completed ?? 0).toLocaleString('ar-EG')} منتهية`}
           icon={<CampaignIcon />}
-          color="green"
+          color="brand"
         />
         <StatsCard
           title="المستخدمون"
@@ -107,7 +107,7 @@ export default function DashboardPage() {
           value={msgStats?.total}
           subtitle="رسالة واتساب"
           icon={<MessageIcon />}
-          color="blue"
+          color="brand"
         />
         <StatsCard
           title="معدل الوصول"
@@ -119,7 +119,7 @@ export default function DashboardPage() {
           title="معدل القراءة"
           value={fmtPct(readRate)}
           subtitle={`${msgStats?.read?.toLocaleString('ar-EG') ?? 0} رسالة`}
-          color="purple"
+          color="gold"
         />
         <StatsCard
           title="معدل الفشل"
