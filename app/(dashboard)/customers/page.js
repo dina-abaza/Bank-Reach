@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useCustomers } from '@/hooks/use-customers';
+import { authService } from '@/services/auth.service';
 import Header from '@/components/layout/Header';
 import CustomerTable from '@/components/customers/CustomerTable';
 import CustomerForm from '@/components/customers/CustomerForm';
 import ImportExcelModal from '@/components/customers/ImportExcelModal';
+import DeleteAllCustomersModal from '@/components/customers/DeleteAllCustomersModal';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -24,14 +26,17 @@ export default function CustomersPage() {
   const {
     customers, pagination, loading, error,
     params, updateParams,
-    createCustomer, updateCustomer, deleteCustomer, importExcel,
+    createCustomer, updateCustomer, deleteCustomer, deleteAllCustomers, importExcel,
   } = useCustomers();
 
-  const [showAddModal, setShowAddModal]       = useState(false);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [editingCustomer, setEditingCustomer] = useState(null);
-  const [actionError, setActionError]         = useState(null);
-  const [search, setSearch]                   = useState('');
+  const [showAddModal, setShowAddModal]         = useState(false);
+  const [showImportModal, setShowImportModal]   = useState(false);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+  const [editingCustomer, setEditingCustomer]   = useState(null);
+  const [actionError, setActionError]           = useState(null);
+  const [search, setSearch]                     = useState('');
+
+  const isAdmin = authService.getUser()?.role === 'admin';
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -70,6 +75,10 @@ export default function CustomersPage() {
     return await importExcel(file);
   };
 
+  const handleDeleteAll = async () => {
+    await deleteAllCustomers();
+  };
+
   return (
     <div className="space-y-5">
       <Header
@@ -86,6 +95,11 @@ export default function CustomersPage() {
             <Button onClick={() => setShowAddModal(true)}>
               + إضافة عميل
             </Button>
+            {isAdmin && (
+              <Button variant="danger" onClick={() => setShowDeleteAllModal(true)}>
+                حذف الكل
+              </Button>
+            )}
           </>
         }
       />
@@ -137,6 +151,13 @@ export default function CustomersPage() {
       <Modal isOpen={showImportModal} onClose={() => setShowImportModal(false)} title="استيراد عملاء من Excel">
         <ImportExcelModal onImport={handleImport} onCancel={() => setShowImportModal(false)} />
       </Modal>
+
+      {/* مودال حذف الكل */}
+      <DeleteAllCustomersModal
+        isOpen={showDeleteAllModal}
+        onClose={() => setShowDeleteAllModal(false)}
+        onConfirm={handleDeleteAll}
+      />
     </div>
   );
 }

@@ -54,6 +54,12 @@ export function useCustomers(initialParams = {}) {
     return result;
   }, [params, fetchCustomers]);
 
+  const deleteAllCustomers = useCallback(async () => {
+    const result = await customersService.deleteAll();
+    await fetchCustomers(params);
+    return result;
+  }, [params, fetchCustomers]);
+
   const importExcel = useCallback(async (file) => {
     const result = await customersService.importExcel(file);
     await fetchCustomers(params);
@@ -70,6 +76,7 @@ export function useCustomers(initialParams = {}) {
     createCustomer,
     updateCustomer,
     deleteCustomer,
+    deleteAllCustomers,
     importExcel,
     refresh: () => fetchCustomers(params),
   };

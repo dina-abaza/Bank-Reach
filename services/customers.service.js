@@ -21,6 +21,11 @@ export const customersService = {
     return response.data;
   },
 
+  async deleteAll() {
+    const response = await api.delete('/customers');
+    return response.data;
+  },
+
   async importExcel(file) {
     const formData = new FormData();
     formData.append('file', file);
