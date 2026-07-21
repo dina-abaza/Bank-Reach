@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useCustomers } from '@/hooks/use-customers';
-import { authService } from '@/services/auth.service';
 import Header from '@/components/layout/Header';
 import CustomerTable from '@/components/customers/CustomerTable';
 import CustomerForm from '@/components/customers/CustomerForm';
@@ -35,8 +34,6 @@ export default function CustomersPage() {
   const [editingCustomer, setEditingCustomer]   = useState(null);
   const [actionError, setActionError]           = useState(null);
   const [search, setSearch]                     = useState('');
-
-  const isAdmin = authService.getUser()?.role === 'admin';
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -95,11 +92,9 @@ export default function CustomersPage() {
             <Button onClick={() => setShowAddModal(true)}>
               + إضافة عميل
             </Button>
-            {isAdmin && (
-              <Button variant="danger" onClick={() => setShowDeleteAllModal(true)}>
-                حذف الكل
-              </Button>
-            )}
+            <Button variant="danger" onClick={() => setShowDeleteAllModal(true)}>
+              حذف الكل
+            </Button>
           </>
         }
       />
