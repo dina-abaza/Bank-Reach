@@ -21,6 +21,13 @@ const groupLabels = {
   TRANSFERRED: 'محولون',
 };
 
+function formatScheduledAt(dateStr) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleString('ar-EG', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+  });
+}
+
 export default function CampaignCard({ campaign, onTrigger, onEdit, onDelete, onViewDetails }) {
   const [triggering, setTriggering] = useState(false);
   const [deleting,   setDeleting]   = useState(false);
@@ -49,6 +56,14 @@ export default function CampaignCard({ campaign, onTrigger, onEdit, onDelete, on
       <div className="mb-3">
         <div className="flex items-center gap-2 mb-1">
           <CampaignStatusBadge status={campaign.status} />
+          {campaign.status === 'scheduled' && campaign.scheduledAt && (
+            <span className="flex items-center gap-1 text-xs font-medium text-brand-600">
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {formatScheduledAt(campaign.scheduledAt)}
+            </span>
+          )}
           <p className="text-xs text-slate-400">
             {groupLabels[campaign.targetCustomerGroup] || campaign.targetCustomerGroup}
           </p>
