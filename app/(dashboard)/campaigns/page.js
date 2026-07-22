@@ -58,15 +58,6 @@ export default function CampaignsPage() {
 
   const handleDelete = async (id) => {
     setActionError(null);
-    const campaign = campaigns.find((c) => c.id === id);
-    if (campaign?.status === 'running') {
-      setActionError('لا يمكن حذف حملة جارية — انتظر حتى تكتمل أولاً');
-      return;
-    }
-    if (campaign?.status === 'completed') {
-      setActionError('لا يمكن حذف حملة منتهية');
-      return;
-    }
     try {
       await deleteCampaign(id);
     } catch (err) {
