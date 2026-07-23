@@ -20,9 +20,6 @@ export default function CustomerForm({ onSubmit, onCancel, initialData = null })
     guarantorName:       initialData?.guarantorName       ?? '',
     guarantorPhone:      initialData?.guarantorPhone      ?? '',
     dueDate:             toDateInput(initialData?.dueDate),
-    importedOverdueDays: initialData?.importedOverdueDays ?? '',
-    notes:               initialData?.notes               ?? '',
-    tags:                initialData?.tags?.join(', ')    ?? '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
@@ -39,9 +36,7 @@ export default function CustomerForm({ onSubmit, onCancel, initialData = null })
     try {
       const payload = {
         ...form,
-        importedOverdueDays: form.importedOverdueDays ? Number(form.importedOverdueDays) : undefined,
         dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : undefined,
-        tags: form.tags ? form.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
       };
       await onSubmit(payload);
     } catch (err) {
@@ -95,44 +90,14 @@ export default function CustomerForm({ onSubmit, onCancel, initialData = null })
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="تاريخ الاستحقاق"
-          id="dueDate"
-          name="dueDate"
-          type="date"
-          value={form.dueDate}
-          onChange={handleChange}
-          required
-        />
-        <Input
-          label="أيام التأخير المستوردة"
-          id="importedOverdueDays"
-          name="importedOverdueDays"
-          type="number"
-          min="0"
-          value={form.importedOverdueDays}
-          onChange={handleChange}
-          placeholder="0"
-        />
-      </div>
-
       <Input
-        label="ملاحظات"
-        id="notes"
-        name="notes"
-        value={form.notes}
+        label="تاريخ الاستحقاق"
+        id="dueDate"
+        name="dueDate"
+        type="date"
+        value={form.dueDate}
         onChange={handleChange}
-        placeholder="يفضل الاتصال مساءً"
-      />
-
-      <Input
-        label="العلامات (Tags) — مفصولة بفاصلة"
-        id="tags"
-        name="tags"
-        value={form.tags}
-        onChange={handleChange}
-        placeholder="vip, مهم"
+        required
       />
 
       <ModalFooter>
